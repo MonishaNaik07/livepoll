@@ -180,7 +180,10 @@ func (r *VoteRepo) Unapplied(ctx context.Context, olderThan time.Time, limit int
 	}
 	defer cur.Close(ctx)
 	var out []models.Vote
-	return out, cur.All(ctx, &out)
+	if err := cur.All(ctx, &out); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (r *VoteRepo) DeleteByPoll(ctx context.Context, poll primitive.ObjectID) error {
