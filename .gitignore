@@ -1,0 +1,16 @@
+# env / secrets
+.env
+.env.*
+!.env.example
+# go
+backend/bin/
+*.exe
+*.test
+*.out
+# node
+node_modules/
+frontend/dist/
+# editors / os
+.vscode/
+.idea/
+.DS_Store

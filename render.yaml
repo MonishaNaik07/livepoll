@@ -1,0 +1,19 @@
+# Render Blueprint: one Docker web service. MongoDB (Atlas) and Redis are external, supplied via env vars.
+services:
+  - type: web
+    name: livepoll
+    runtime: docker
+    plan: free
+    healthCheckPath: /readyz
+    envVars:
+      - { key: APP_ENV, value: production }
+      - { key: COOKIE_SECURE, value: "true" }
+      - { key: COOKIE_SAMESITE, value: lax }
+      - { key: MONGO_URI, sync: false }          # Atlas SRV string
+      - { key: MONGO_DB, value: livepoll }
+      - { key: REDIS_ADDR, sync: false }         # host:port of your Redis
+      - { key: REDIS_PASSWORD, sync: false }
+      - { key: REDIS_TLS, value: "true" }
+      - { key: JWT_SECRET, generateValue: true }
+      - { key: FRONTEND_ORIGIN, sync: false }    # https://<your-service>.onrender.com
+      - { key: PUBLIC_APP_URL, sync: false }     # same value as FRONTEND_ORIGIN
