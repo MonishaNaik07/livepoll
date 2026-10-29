@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
 import { SharePanel } from '../components/SharePanel'
 import { api, ApiError } from '../services/api'
 import type { Poll } from '../types'
