@@ -55,8 +55,7 @@ export default function CreatePoll() {
         <h1>Poll created 🎉</h1>
         <p className="lead-sm">{created.question}</p>
         <SharePanel url={created.shareUrl} />
-        <div className="row">
-          <Link className="btn" to={`/p/${created.id}`}>Open live results</Link>
+        <div className="row wrap">
           <button className="btn btn-ghost" onClick={() => { setCreated(null); setQuestion(''); setDescription(''); setOptions(['', '']); setExpiresAt('') }}>Create another</button>
         </div>
       </section>

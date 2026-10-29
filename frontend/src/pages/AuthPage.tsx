@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { LogoMark } from '../components/Icons'
 import { useAuth } from '../contexts/AuthContext'
 import { ApiError } from '../services/api'
 
@@ -12,6 +13,12 @@ export function validateAuth(mode: 'login' | 'signup', f: { name: string; email:
   return e
 }
 
+const PERKS = [
+  ['⚡', 'Votes appear live, with no refresh'],
+  ['🔗', 'Share with one link or a QR code'],
+  ['🛡️', 'One vote per person, enforced on the server'],
+]
+
 export default function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
   const { user, login, signup } = useAuth()
   const nav = useNavigate()
@@ -20,8 +27,11 @@ export default function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [formError, setFormError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [show, setShow] = useState(false)
 
   if (user) return <Navigate to={from} replace />
+
+  const isLogin = mode === 'login'
 
   const submit = async (ev: FormEvent) => {
     ev.preventDefault()
@@ -31,7 +41,7 @@ export default function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
     if (Object.keys(v).length) return
     setBusy(true)
     try {
-      if (mode === 'login') await login(f.email.trim(), f.password)
+      if (isLogin) await login(f.email.trim(), f.password)
       else await signup(f.name.trim(), f.email.trim(), f.password)
       nav(from, { replace: true })
     } catch (err) {
@@ -42,29 +52,51 @@ export default function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
     }
   }
 
-  const field = (id: 'name' | 'email' | 'password', label: string, type: string, auto: string) => (
+  const field = (id: 'name' | 'email' | 'password', label: string, type: string, auto: string, placeholder: string) => (
     <div className="field">
       <label htmlFor={id} className="label">{label}</label>
-      <input id={id} name={id} type={type} className="input" autoComplete={auto} value={f[id]}
-        aria-invalid={!!errors[id]} aria-describedby={errors[id] ? `${id}-err` : undefined}
-        onChange={(e) => setF({ ...f, [id]: e.target.value })} />
+      <div className="au-input">
+        <input id={id} name={id} type={id === 'password' && show ? 'text' : type} className="input" autoComplete={auto}
+          placeholder={placeholder} value={f[id]} aria-invalid={!!errors[id]} aria-describedby={errors[id] ? `${id}-err` : undefined}
+          onChange={(e) => setF({ ...f, [id]: e.target.value })} />
+        {id === 'password' && (
+          <button type="button" className="au-eye" aria-pressed={show} onClick={() => setShow((s) => !s)}>
+            {show ? 'Hide' : 'Show'}
+          </button>
+        )}
+      </div>
       {errors[id] && <p id={`${id}-err`} className="error">{errors[id]}</p>}
     </div>
   )
 
   return (
-    <section className="card narrow">
-      <h1>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h1>
-      <form onSubmit={submit} noValidate>
-        {mode === 'signup' && field('name', 'Name', 'text', 'name')}
-        {field('email', 'Email', 'email', 'email')}
-        {field('password', 'Password', 'password', mode === 'login' ? 'current-password' : 'new-password')}
-        {formError && <p className="error banner" role="alert">{formError}</p>}
-        <button className="btn btn-block" type="submit" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Log in' : 'Sign up'}</button>
-      </form>
-      <p className="muted center-text">
-        {mode === 'login' ? <>New here? <Link to="/signup">Create an account</Link></> : <>Already registered? <Link to="/login">Log in</Link></>}
-      </p>
-    </section>
+    <div className="au">
+      <aside className="au-brand" aria-hidden="true">
+        <span className="au-logo"><LogoMark /> LivePoll</span>
+        <h2>{isLogin ? 'Good to see you again.' : 'Start your first live poll.'}</h2>
+        <p>{isLogin ? 'Pick up where you left off and watch the votes roll in.' : 'It takes less than a minute to create a poll and share it.'}</p>
+        <ul>
+          {PERKS.map(([icon, text]) => <li key={text}><span>{icon}</span>{text}</li>)}
+        </ul>
+        <span className="au-blob au-blob-a" /><span className="au-blob au-blob-b" />
+      </aside>
+
+      <section className="au-card">
+        <h1>{isLogin ? 'Welcome back' : 'Create your account'}</h1>
+        <p className="au-sub">{isLogin ? 'Log in to manage your polls.' : 'Sign up to create and manage polls.'}</p>
+        <form onSubmit={submit} noValidate>
+          {!isLogin && field('name', 'Name', 'text', 'name', 'Your name')}
+          {field('email', 'Email', 'email', 'email', 'you@example.com')}
+          {field('password', 'Password', 'password', isLogin ? 'current-password' : 'new-password', isLogin ? 'Your password' : 'At least 8 characters')}
+          {formError && <p className="error banner" role="alert">{formError}</p>}
+          <button className="btn btn-block btn-lg lp-btn" type="submit" disabled={busy}>
+            {busy ? 'Please wait…' : isLogin ? 'Log in' : 'Create account'}
+          </button>
+        </form>
+        <p className="au-switch">
+          {isLogin ? <>New here? <Link to="/signup">Create an account</Link></> : <>Already registered? <Link to="/login">Log in</Link></>}
+        </p>
+      </section>
+    </div>
   )
 }

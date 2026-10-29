@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { LogoMark } from '../components/Icons'
 
 export function AppLayout() {
   const { user, logout } = useAuth()
@@ -18,7 +19,7 @@ export function AppLayout() {
       <a href="#main" className="skip">Skip to content</a>
       <header className="nav">
         <div className="nav-inner">
-          <Link to="/" className="brand" onClick={close}><span className="logo" aria-hidden="true" />LivePoll</Link>
+          <Link to="/" className="brand" onClick={close}><LogoMark />LivePoll</Link>
           <button className="btn btn-ghost menu" aria-expanded={open} aria-controls="nav-links" onClick={() => setOpen((o) => !o)}>Menu</button>
           <nav id="nav-links" className={`links${open ? ' open' : ''}`} aria-label="Main">
             {user ? (

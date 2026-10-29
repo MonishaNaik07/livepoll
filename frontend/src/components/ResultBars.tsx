@@ -18,6 +18,7 @@ export function ResultBars({ options, results, highlightId }: Props) {
               <div className="bar-head">
                 <span className="bar-label">
                   {o.text}
+                  {leading && <span className="chip lead">Leading</span>}
                   {highlightId === o.id && <span className="chip">Your vote</span>}
                 </span>
                 <span className="bar-num"><strong>{pct[o.id]}%</strong> · {fmtNumber(n)} {n === 1 ? 'vote' : 'votes'}</span>
